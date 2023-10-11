@@ -7,6 +7,7 @@ namespace UnitTestingA1Base.Data
     /// A single Ingredient may fulfill multiple Dietary Restrictions and vice-versa. Similarly, Recipes use many Ingredients and vice-versa.
     /// 
     /// Note that multi-table queries (e.g. Includes methods) are not available for these collections and manual joins are required.
+    /// Hashsets doesnt support query like joins // extra
     /// </summary>
 
     public class AppStorage
@@ -136,6 +137,15 @@ namespace UnitTestingA1Base.Data
             {
                 Id = 5,
                 Name = "Lactose-Free"
+            },  new DietaryRestriction
+            {
+                Id = 11, // manual addition
+                Name = "jalapino"
+            },
+             new DietaryRestriction
+            {
+                Id = 13, //
+                Name = "Olive"
             }
         };
 
@@ -190,7 +200,13 @@ namespace UnitTestingA1Base.Data
             {
                 Id = 10,
                 Name = "Cucumbers"
-            }
+            },
+            new Ingredient // manual addition
+            {
+                Id = 11,
+                Name = "berries"
+            },
+
         };
 
             RecipeIngredients = new HashSet<RecipeIngredient>
@@ -349,6 +365,16 @@ namespace UnitTestingA1Base.Data
             {
                 DietaryRestrictionId = 5,
                 IngredientId = 10
+            },
+            new IngredientRestriction // test
+            {
+                DietaryRestrictionId = 11,
+                IngredientId = 0 // even 55 works
+            },
+            new IngredientRestriction //test
+            {
+                 DietaryRestrictionId = 12,
+                 IngredientId = 66
             }
         };
 

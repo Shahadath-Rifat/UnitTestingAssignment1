@@ -1,4 +1,5 @@
 #region Setup
+using System;
 using UnitTestingA1Base.Data;
 using UnitTestingA1Base.Models;
 
@@ -10,10 +11,10 @@ app.UseHttpsRedirection();
 
 // Application Storage persists for single session
 AppStorage appStorage = new AppStorage();
-BusinessLogicLayer bll = new BusinessLogicLayer(appStorage);    
+BusinessLogicLayer bll = new BusinessLogicLayer(appStorage);
+
+
 #endregion
-
-
 #region Endpoints
 
 /*
@@ -28,35 +29,106 @@ BusinessLogicLayer bll = new BusinessLogicLayer(appStorage);
  * Requests with a Name AND ID argument should query the database using the ID. If no match is found, the query should again be performed using the name.
  */
 
+//  Self-test
+app.MapGet("/allRecipe", () =>
+{
+    try
+    {
+        // Retrieve all recipes without specifying any parameters.
+        HashSet<Recipe> recipes = bll.GetAllRecipes();
+        return Results.Ok(recipes);
+    }
+    catch (Exception ex)
+    {
+        return Results.NotFound(ex.Message);
+    }
+});
+
+
+
 ///<summary>
 /// Returns a HashSet of all Recipes that contain the specified Ingredient by name or Primary Key
 /// </summary>
-app.MapGet("/recipes/byIngredient", (string? name, int? id) =>
+app.MapGet("/recipes/byIngredient", (int ? id, string ? name) =>   // check the ingredients
 {
     try 
     {
         HashSet<Recipe> recipes = bll.GetRecipesByIngredient(id, name);
         return Results.Ok(recipes);
-    } catch(Exception ex)
+
+    }
+    catch (ArgumentOutOfRangeException ex)
     {
-        return Results.NotFound();
+        return Results.NotFound(ex.Message);
+    }
+    catch (InvalidOperationException ex)
+    {
+        return Results.NotFound(ex.Message);
+    }
+
+    catch (Exception ex)
+    {
+        return Results.NotFound(ex.Message);
     }
 });
+
+
 
 ///<summary>
 /// Returns a HashSet of all Recipes that only contain ingredients that belong to the Dietary Restriction provided by name or Primary Key
 /// </summary>
-app.MapGet("/recipes/byDiet", (string name, int id) =>
+app.MapGet("/recipes/byDiet", (int? id, string? name) =>
 {
+    try
+    {
+        HashSet<Recipe> recipes = bll.GetRecipesByDiet(id, name);
+        return Results.Ok(recipes);
 
+    }
+    catch (ArgumentOutOfRangeException ex)
+    {
+        return Results.NotFound(ex.Message);
+    }
+    catch (InvalidOperationException ex)
+    {
+        return Results.NotFound(ex.Message);
+    }
+
+    catch (Exception ex)
+    {
+        return Results.NotFound(ex.Message);
+    }
 });
+
+
+
+
+
 
 ///<summary>
 ///Returns a HashSet of all recipes by either Name or Primary Key. 
 /// </summary>
-app.MapGet("/recipes", (string name, int id) =>
+app.MapGet("/recipes", (int? id, string? name) =>
 {
+    try
+    {
+        HashSet<Recipe> recipes = bll.GetRecipes(id, name); // GetRecipes
+        return Results.Ok(recipes);
 
+    }
+    catch (ArgumentOutOfRangeException ex)
+    {
+        return Results.NotFound(ex.Message);
+    }
+    catch (InvalidOperationException ex)
+    {
+        return Results.NotFound(ex.Message);
+    }
+
+    catch (Exception ex)
+    {
+        return Results.NotFound(ex.Message);
+    }
 });
 
 ///<summary>
@@ -72,7 +144,26 @@ app.MapGet("/recipes", (string name, int id) =>
 /// 
 /// All IDs should be created for these objects using the returned value of the AppStorage.GeneratePrimaryKey() method
 /// </summary>
-app.MapPost("/recipes", () => {
+app.MapPost("/recipes", (NewRecipe newRecipe) => {
+
+    try
+    {
+        bll.CreateRecipe(newRecipe);
+
+        return Results.Ok(newRecipe);
+    }
+    catch (ArgumentNullException ex)
+    {
+        return Results.Problem(ex.Message);
+    }
+    catch (InvalidOperationException ex)
+    {
+        return Results.NotFound(ex.Message);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
 
 });
 
@@ -81,10 +172,28 @@ app.MapPost("/recipes", () => {
 /// If there is only one Recipe using that Ingredient, then the Recipe is also deleted, as well as all associated RecipeIngredients
 /// If there are multiple Recipes using that ingredient, a Forbidden response code should be provided with an appropriate message
 ///</summary>
-app.MapDelete("/ingredients", (int id, string name) =>
+app.MapDelete("/ingredients", (int id, string name) =>  //  localhost:7233/ingredients?id=0&name=salt1 
 {
-
+    try
+    {
+       
+        Ingredient ingredientToDelete = bll.DeleteIngredient(id, name); 
+        return Results.NoContent();
+    }
+    catch (ArgumentNullException ex)
+    {
+        return Results.NotFound(ex.Message);
+    }
+    catch (InvalidOperationException ex)
+    {
+        return Results.NotFound(ex.Message);
+    }
+    catch (Exception ex)
+    {
+        return Results.NotFound(ex.Message);
+    }
 });
+
 
 /// <summary>
 /// Deletes the requested recipe from the database
@@ -92,7 +201,23 @@ app.MapDelete("/ingredients", (int id, string name) =>
 /// </summary>
 app.MapDelete("/recipes", (int id, string name) =>
 {
-
+    try
+    {
+        Recipe deletedRecipe = bll.DeleteRecipe(id, name);
+        return Results.NoContent();
+    }
+    catch (ArgumentNullException ex)
+    {
+        return Results.NotFound(ex.Message);
+    }
+    catch (InvalidOperationException ex)
+    {
+        return Results.NotFound(ex.Message);
+    }
+    catch (Exception ex)
+    {
+        return Results.NotFound(ex.Message);
+    }
 });
 
 #endregion
